@@ -95,7 +95,7 @@ final class WP_Comment_Type {
 	public $show_ui;
 
 	/**
-	 * Whether to generate and allow a UI for managing this comment type in the admin.
+	 * Whether to include the comment type into the /wp-admin/comments.php dropdown filter.
 	 *
 	 * Default is the value of $public.
 	 *

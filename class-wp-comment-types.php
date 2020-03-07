@@ -161,7 +161,7 @@ final class WP_Comment_Types {
 	}
 
 	/**
-	 * Class Autoload function
+	 * Class Autoloader.
 	 *
 	 * @since  1.0.0
 	 *
