@@ -73,8 +73,8 @@ function create_initial_comment_types() {
 		array(
 			'label'                 => __( 'Comments', 'wp-comment-types' ),
 			'labels'                => array(
-				'singular_name'  => _x( 'Comment', 'Comment singular name', 'wp-comment-types' ),
-				'name_admin_nav' => _x( 'Comments', 'Comment screen main nav', 'wp-comment-types' ),
+				'singular_name'   => _x( 'Comment', 'Comment singular name', 'wp-comment-types' ),
+				'admin_menu_name' => _x( 'Comments', 'Comment screen main nav', 'wp-comment-types' ),
 			),
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
@@ -92,8 +92,8 @@ function create_initial_comment_types() {
 		array(
 			'label'                 => __( 'Pings' ),
 			'labels'                => array(
-				'singular_name'  => _x( 'Ping', 'Comment singular name' ),
-				'name_admin_nav' => _x( 'Pings', 'Comment screen main nav' ),
+				'singular_name'   => _x( 'Ping', 'Comment singular name' ),
+				'admin_menu_name' => _x( 'Pings', 'Comment screen main nav' ),
 			),
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
@@ -111,8 +111,8 @@ function create_initial_comment_types() {
 		array(
 			'label'                 => __( 'Trackbacks', 'wp-comment-types' ),
 			'labels'                => array(
-				'singular_name'  => _x( 'Trackback', 'Comment singular name', 'wp-comment-types' ),
-				'name_admin_nav' => _x( 'Trackbacks', 'Comment screen main nav', 'wp-comment-types' ),
+				'singular_name'   => _x( 'Trackback', 'Comment singular name', 'wp-comment-types' ),
+				'admin_menu_name' => _x( 'Trackbacks', 'Comment screen main nav', 'wp-comment-types' ),
 			),
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
@@ -159,8 +159,8 @@ function get_comment_type_labels( $comment_type_object ) {
 		$labels->name = $comment_type_object->name;
 	}
 
-	if ( ! isset( $labels->name_admin_nav ) ) {
-		$labels->name_admin_nav = $comment_type_object->name;
+	if ( ! isset( $labels->admin_menu_name ) ) {
+		$labels->admin_menu_name = $comment_type_object->name;
 	}
 
 	if ( ! isset( $labels->awaiting_mod_item ) ) {

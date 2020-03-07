@@ -151,13 +151,28 @@ final class WP_Comment_Types {
 		// Classes.
 		spl_autoload_register( array( $this, 'autoload' ) );
 
-		// Functions.
+		// Pathes.
 		$inc_path    = plugin_dir_path( __FILE__ ) . 'inc/';
 		$wp_inc_path = plugin_dir_path( __FILE__ ) . 'wp-includes/';
 
+		if ( is_admin() ) {
+			$wp_admin_path = plugin_dir_path( __FILE__ ) . 'wp-admin/';
+		}
+
+		// Includes.
 		require $inc_path . 'globals.php';
 		require $wp_inc_path . 'comment.php';
+
+		if ( is_admin() ) {
+			require $wp_admin_path . 'edit-comments.php';
+			require $wp_admin_path . 'menu.php';
+		}
+
 		require $wp_inc_path . 'default-filters.php';
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			require $inc_path . 'example.php';
+		}
 	}
 
 	/**
@@ -171,6 +186,7 @@ final class WP_Comment_Types {
 		if ( 0 !== strpos( $class, 'WP\\CommentTypes\\' ) ) {
 			return;
 		}
+
 		$name = str_replace(
 			array( 'wp\\commenttypes\\', '_' ),
 			array( '', '-' ),

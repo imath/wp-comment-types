@@ -95,7 +95,7 @@ final class WP_Comment_Type {
 	public $show_ui;
 
 	/**
-	 * Whether to include the comment type into the /wp-admin/comments.php dropdown filter.
+	 * Whether to include the comment type into the /wp-admin/edit-comments.php dropdown filter.
 	 *
 	 * Default is the value of $public.
 	 *
@@ -272,6 +272,12 @@ final class WP_Comment_Type {
 		// If there's no specified edit link and no UI, remove the edit link.
 		if ( ! $args['show_ui'] && ! $has_edit_link ) {
 			$args['_edit_link'] = '';
+		}
+
+		if ( ! $args['capabilities'] || ! is_array( $args['capabilities'] ) ) {
+			$args['capabilities'] = array(
+				'list_comment_type_items' => 'edit_posts',
+			);
 		}
 
 		foreach ( $args as $property_name => $property_value ) {
