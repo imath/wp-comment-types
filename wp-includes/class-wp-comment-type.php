@@ -1,11 +1,18 @@
 <?php
 /**
- * Comment API: WP_Comment_Type class
+ * Comment API: WP_Comment_Type class.
  *
  * @package WP\CommentTypes
- * @subpackage inc\classes\WP_Comment_Type
+ * @subpackage \wp-includes\WP_Comment_Type
  * @since 1.0.0
  */
+
+namespace WP\CommentTypes;
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Class used for interacting with comment types.
@@ -85,7 +92,17 @@ final class WP_Comment_Type {
 	 * @since 1.0.0
 	 * @var boolean $show_ui
 	 */
-	public $show_ui = false;
+	public $show_ui;
+
+	/**
+	 * Whether to generate and allow a UI for managing this comment type in the admin.
+	 *
+	 * Default is the value of $public.
+	 *
+	 * @since 1.0.0
+	 * @var boolean $show_in_comments_dropdown
+	 */
+	public $show_in_comments_dropdown;
 
 	/**
 	 * Whether to delete comments of this type when deleting a user.
@@ -103,7 +120,7 @@ final class WP_Comment_Type {
 	 * @since 1.0.0
 	 * @var boolean $_builtin
 	 */
-	public $_builtin = false;
+	public $_builtin = false; // phpcs:ignore
 
 	/**
 	 * URL segment to use for edit link of this comment type.
@@ -113,7 +130,7 @@ final class WP_Comment_Type {
 	 * @since 1.0.0
 	 * @var string $_edit_link
 	 */
-	public $_edit_link = 'comment.php?comment=%d';
+	public $_edit_link = 'comment.php?comment=%d'; // phpcs:ignore
 
 	/**
 	 * Comment type capabilities.
@@ -211,21 +228,21 @@ final class WP_Comment_Type {
 
 		// Args prefixed with an underscore are reserved for internal use.
 		$defaults = array(
-			'labels'                => array(),
-			'plural'                => null,
-			'singular'              => null,
-			'description'           => '',
-			'public'                => false,
-			'show_ui'               => null,
-			'nav_position'          => null,
-			'capabilities'          => array(),
-			'supports'              => array(),
-			'delete_with_user'      => null,
-			'show_in_rest'          => false,
-			'rest_base'             => false,
-			'rest_controller_class' => false,
-			'_builtin'              => false,
-			'_edit_link'            => 'comment.php?comment=%d',
+			'labels'                    => array(),
+			'plural'                    => null,
+			'singular'                  => null,
+			'description'               => '',
+			'public'                    => true,
+			'show_ui'                   => null,
+			'show_in_comments_dropdown' => null,
+			'capabilities'              => array(),
+			'supports'                  => array(),
+			'delete_with_user'          => false,
+			'show_in_rest'              => false,
+			'rest_base'                 => false,
+			'rest_controller_class'     => false,
+			'_builtin'                  => false,
+			'_edit_link'                => 'comment.php?comment=%d',
 		);
 
 		$args = array_merge( $defaults, $args );
@@ -245,6 +262,11 @@ final class WP_Comment_Type {
 		// If not set, default to the setting for public.
 		if ( null === $args['show_ui'] ) {
 			$args['show_ui'] = $args['public'];
+		}
+
+		// If not set, default to the setting for public.
+		if ( null === $args['show_in_comments_dropdown'] ) {
+			$args['show_in_comments_dropdown'] = $args['public'];
 		}
 
 		// If there's no specified edit link and no UI, remove the edit link.

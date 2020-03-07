@@ -134,7 +134,6 @@ final class WP_Comment_Types {
 	 * @since 1.0.0
 	 */
 	public static function start() {
-
 		// If the single instance hasn't been set, set it now.
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -153,10 +152,12 @@ final class WP_Comment_Types {
 		spl_autoload_register( array( $this, 'autoload' ) );
 
 		// Functions.
-		$inc_path = plugin_dir_path( __FILE__ ) . 'inc/';
+		$inc_path    = plugin_dir_path( __FILE__ ) . 'inc/';
+		$wp_inc_path = plugin_dir_path( __FILE__ ) . 'wp-includes/';
 
 		require $inc_path . 'globals.php';
-		require $inc_path . 'comment.php';
+		require $wp_inc_path . 'comment.php';
+		require $wp_inc_path . 'default-filters.php';
 	}
 
 	/**
@@ -167,13 +168,16 @@ final class WP_Comment_Types {
 	 * @param  string $class The class name.
 	 */
 	public function autoload( $class ) {
-		$name = str_replace( '_', '-', strtolower( $class ) );
-
-		if ( false === strpos( $name, 'wp-comment' ) ) {
+		if ( 0 !== strpos( $class, 'WP\\CommentTypes\\' ) ) {
 			return;
 		}
+		$name = str_replace(
+			array( 'wp\\commenttypes\\', '_' ),
+			array( '', '-' ),
+			strtolower( $class )
+		);
 
-		$path = plugin_dir_path( __FILE__ ) . "inc/classes/class-{$name}.php";
+		$path = plugin_dir_path( __FILE__ ) . "wp-includes/class-{$name}.php";
 
 		// Sanity check.
 		if ( ! file_exists( $path ) ) {

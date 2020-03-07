@@ -1,6 +1,6 @@
 <?php
 /**
- * Functions about globals
+ * Functions about globals.
  *
  * @package WP\CommentTypes
  * @subpackage \inc\globals
@@ -21,8 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function register_globals() {
 	$wpct = instance();
 
-	$wpct->version  = '1.0.0';
-	$wpct->inc_path = plugin_dir_path( __FILE__ );
+	$wpct->version     = '1.0.0';
+	$wpct->inc_path    = plugin_dir_path( __FILE__ );
+	$wpct->wp_inc_path = plugin_dir_path( dirname( __FILE__ ) ) . 'wp-includes';
 
 	$wpct->assets_url         = plugin_dir_url( dirname( __FILE__ ) ) . 'assets';
 	$wpct->languages_path     = plugin_dir_path( dirname( __FILE__ ) ) . 'languages';

@@ -1,9 +1,9 @@
 <?php
 /**
- * Comment functions
+ * Comment functions.
  *
  * @package WP\CommentTypes
- * @subpackage \inc\comment
+ * @subpackage \wp-includes\comment
  */
 
 namespace WP\CommentTypes;
@@ -21,9 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $comment_type Comment type key. Must not exceed 20 characters and may
  *                             only contain lowercase alphanumeric characters, dashes,
  *                             and underscores. See `sanitize_key()`.
- * @param array $args {
- *     Array or string of arguments for registering a comment type.
- * }
+ * @param array  $args         Array or string of arguments for registering a comment type.
+ *
  * @return WP_Comment_Type|WP_Error The registered comment type object on success,
  *                                  WP_Error object on failure.
  */
@@ -34,16 +33,19 @@ function register_comment_type( $comment_type, $args = array() ) {
 		$wp_comment_types = array();
 	}
 
-	// Sanitize post type name
+	// Sanitize post type name.
 	$comment_type = sanitize_key( $comment_type );
 
 	if ( empty( $comment_type ) || strlen( $comment_type ) > 20 ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Comment type names must be between 1 and 20 characters in length.' ), '5.4.0' );
-		return new WP_Error( 'comment_type_length_invalid', __( 'Comment type names must be between 1 and 20 characters in length.' ) );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Comment type names must be between 1 and 20 characters in length.', 'wp-comment-types' ), '1.0.0' );
+		return new WP_Error( 'comment_type_length_invalid', esc_html__( 'Comment type names must be between 1 and 20 characters in length.', 'wp-comment-types' ) );
 	}
 
-	$comment_type_object                = new WP_Comment_Type( $comment_type, $args );
+	$comment_type_object               = new WP_Comment_Type( $comment_type, $args );
 	$wp_comment_types[ $comment_type ] = $comment_type_object;
+
+	// Update the global.
+	instance()->comment_types = $wp_comment_types;
 
 	/**
 	 * Fires after a comment type is registered.
@@ -69,15 +71,14 @@ function create_initial_comment_types() {
 	register_comment_type(
 		'comment',
 		array(
-			'label'                 => __( 'Comments' ),
+			'label'                 => __( 'Comments', 'wp-comment-types' ),
 			'labels'                => array(
-				'singular_name'  => _x( 'Comment', 'Comment singular name' ),
-				'name_admin_nav' => _x( 'Comments', 'Comment screen main nav' ),
+				'singular_name'  => _x( 'Comment', 'Comment singular name', 'wp-comment-types' ),
+				'name_admin_nav' => _x( 'Comments', 'Comment screen main nav', 'wp-comment-types' ),
 			),
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'nav_position'          => 0,
 			'delete_with_user'      => false,
 			'supports'              => array( 'editor' ),
 			'show_in_rest'          => true,
@@ -97,7 +98,6 @@ function create_initial_comment_types() {
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'nav_position'          => 1,
 			'delete_with_user'      => false,
 			'supports'              => array(),
 			'show_in_rest'          => true,
@@ -109,15 +109,14 @@ function create_initial_comment_types() {
 	register_comment_type(
 		'trackback',
 		array(
-			'label'                 => __( 'Trackbacks' ),
+			'label'                 => __( 'Trackbacks', 'wp-comment-types' ),
 			'labels'                => array(
-				'singular_name'  => _x( 'Trackback', 'Comment singular name' ),
-				'name_admin_nav' => _x( 'Trackbacks', 'Comment screen main nav' ),
+				'singular_name'  => _x( 'Trackback', 'Comment singular name', 'wp-comment-types' ),
+				'name_admin_nav' => _x( 'Trackbacks', 'Comment screen main nav', 'wp-comment-types' ),
 			),
 			'public'                => true,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'nav_position'          => 2,
 			'delete_with_user'      => false,
 			'supports'              => array(),
 			'show_in_rest'          => true,
@@ -127,6 +126,14 @@ function create_initial_comment_types() {
 	);
 }
 
+/**
+ * Gets the comment type object.
+ *
+ * @since 1.0.0
+ *
+ * @param string $comment_type The comment type name.
+ * @return WP_Comment_Type     The comment type object.
+ */
 function get_comment_type_object( $comment_type ) {
 	$wp_comment_types = instance()->comment_types;
 
@@ -137,6 +144,14 @@ function get_comment_type_object( $comment_type ) {
 	return $wp_comment_types[ $comment_type ];
 }
 
+/**
+ * Gets the comment type labels.
+ *
+ * @since 1.0.0
+ *
+ * @param WP_Comment_Type $comment_type_object The comment type object.
+ * @return object                              The comment type labels.
+ */
 function get_comment_type_labels( $comment_type_object ) {
 	$labels = (object) wp_parse_args( $comment_type_object->labels, array() );
 
@@ -150,21 +165,45 @@ function get_comment_type_labels( $comment_type_object ) {
 
 	if ( ! isset( $labels->awaiting_mod_item ) ) {
 		/* translators: %s: Singular for the number of comments awaiting moderation. */
-		$labels->awaiting_mod_item = _x( '%s Comment in moderation', 'Comment Administration screen navigation' );
+		$labels->awaiting_mod_item = _x( '%s Comment in moderation', 'Comment Administration screen navigation', 'wp-comment-types' );
 	}
 
 	if ( ! isset( $labels->awaiting_mod_items ) ) {
 		/* translators: %s: Plural for the number of comments awaiting moderation. */
-		$labels->awaiting_mod_items = _x( '%s Comments in moderation', 'Comment Administration screen navigation' );
+		$labels->awaiting_mod_items = _x( '%s Comments in moderation', 'Comment Administration screen navigation', 'wp-comment-types' );
 	}
 
 	return $labels;
 }
 
+/**
+ * Checks if a comment type exists.
+ *
+ * @since 1.0.0
+ *
+ * @param string $comment_type The comment type name.
+ * @return boolean             True if the comment type exists. False otherwise.
+ */
 function comment_type_exists( $comment_type ) {
 	return (bool) get_comment_type_object( $comment_type );
 }
 
+/**
+ * Gets all registered comment types.
+ *
+ * @since 1.0.0
+ *
+ * @see register_comment_type().
+ *
+ * @param array  $args     Optional. An array of key => value arguments to match against
+ *                         the post type objects. Default empty array.
+ * @param string $output   Optional. The type of output to return. Accepts post type 'names'
+ *                         or 'objects'. Default 'names'.
+ * @param string $operator Optional. The logical operation to perform. 'or' means only one
+ *                         element from the array needs to match; 'and' means all elements
+ *                         must match; 'not' means no elements may match. Default 'and'.
+ * @return array           An array of post type names or objects.
+ */
 function get_comment_types( $args = array(), $output = 'names', $operator = 'and' ) {
 	$wp_comment_types = instance()->comment_types;
 
@@ -219,7 +258,7 @@ function wp_count_comments( $types = array() ) {
 	// If some counts are not available perform the count.
 	if ( $to_count ) {
 		$uncache_counts = array();
-		$comments      = get_comment_count( 0, $to_count );
+		$comments       = get_comment_count( 0, $to_count );
 
 		if ( 1 === count( $to_count ) ) {
 			$type                    = reset( $to_count );
