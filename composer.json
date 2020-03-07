@@ -1,0 +1,17 @@
+{
+  "name": "imath/wp-comment-types",
+  "description": "WordPress comment types feature (as a plugin).",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"support": {
+		"issues": "https://github.com/imath/wp-comment-types/issues"
+	},
+  "require": {
+		"php": ">=5.6"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "~0.6.0",
+		"wp-coding-standards/wpcs": "~2.1.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1.0"
+	}
+}
