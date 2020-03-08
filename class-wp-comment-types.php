@@ -169,6 +169,7 @@ final class WP_Comment_Types {
 		}
 
 		require $wp_inc_path . 'default-filters.php';
+		require $inc_path . 'compat.php';
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			require $inc_path . 'example.php';

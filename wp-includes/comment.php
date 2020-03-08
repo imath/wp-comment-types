@@ -88,7 +88,7 @@ function create_initial_comment_types() {
 	);
 
 	register_comment_type(
-		'pingback',
+		'pings',
 		array(
 			'label'                 => __( 'Pings' ),
 			'labels'                => array(

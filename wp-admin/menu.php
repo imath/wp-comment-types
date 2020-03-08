@@ -36,13 +36,11 @@ function admin_menu() {
 			$comment_type->labels->admin_menu_name,
 			$comment_type->labels->admin_menu_name,
 			$comment_type->capabilities['list_comment_type_items'],
-			'wpct-' . $comment_type->name,
-			__NAMESPACE__ . '\admin_comment_types',
+			add_query_arg( 'comment_type', $comment_type->name, 'edit-comments.php' ),
+			'',
 			$comment_type->menu_icon,
 			(int) $comment_type->menu_position
 		);
-
-		add_action( "load-{$screen}", __NAMESPACE__ . '\admin_comment_types_load' );
 	}
 }
 add_action( 'admin_menu', __NAMESPACE__ . '\admin_menu', 0 ); // highest priority.

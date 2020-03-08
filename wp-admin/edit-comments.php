@@ -21,37 +21,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 function admin_comment_types_load() {
 	$current_screen = get_current_screen();
 
-	if ( isset( $current_screen->id ) ) {
-		$comment_type = str_replace( 'toplevel_page_wpct-', '', $current_screen->id );
-
-		if ( comment_type_exists( $comment_type ) ) {
-			$current_screen->comment_type = $comment_type;
-		}
+	if ( ! isset( $current_screen->id ) || ! isset( $_GET['comment_type'] ) ) { // phpcs:ignore
+		return;
 	}
 
-	if ( ! isset( $current_screen->comment_type ) ) {
+	$comment_type = sanitize_key( wp_unslash( $_GET['comment_type'] ) ); // phpcs:ignore
+
+	if ( ! comment_type_exists( $comment_type ) ) {
 		wp_die( esc_html__( 'Invalid comment type.', 'wp-comment-types' ) );
 	}
-}
 
-/**
- * Displays the Comment Types admin screen.
- *
- * @since 1.0.0
- */
-function admin_comment_types() {
-	$current_screen = get_current_screen();
-	$comment_type   = get_comment_type_object( $current_screen->comment_type );
+	$current_screen->comment_type = $comment_type;
+	$builtin_comment_types        = get_comment_types( array( '_builtin' => true ) );
 
-	if ( null !== $comment_type ) {
-		$title = $comment_type->label;
-	} else {
-		$title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
+	if ( in_array( $comment_type, $builtin_comment_types, true ) ) {
+		return;
 	}
 
+	$comment_type_object = get_comment_type_object( $comment_type );
+
+	if ( null !== $comment_type_object ) {
+		$page_title = $comment_type_object->label;
+	} else {
+		$page_title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
+	}
+
+	require_once ABSPATH . 'wp-admin/admin-header.php';
 	?>
+
 	<div class="wrap">
-		<h1><?php echo esc_html( $title ); ?></h1>
+		<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
+		<hr class="wp-header-end">
 	</div>
+
 	<?php
+	require_once ABSPATH . 'wp-admin/admin-footer.php';
+
+	// Prevents the rest of the admin to load.
+	exit();
 }
