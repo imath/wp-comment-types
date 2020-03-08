@@ -37,7 +37,9 @@ function admin_menu() {
 			$comment_type->labels->admin_menu_name,
 			$comment_type->capabilities['list_comment_type_items'],
 			'wpct-' . $comment_type->name,
-			__NAMESPACE__ . '\admin_comment_types'
+			__NAMESPACE__ . '\admin_comment_types',
+			$comment_type->menu_icon,
+			(int) $comment_type->menu_position
 		);
 	}
 }

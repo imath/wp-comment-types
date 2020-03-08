@@ -33,5 +33,20 @@ function custom_comment_type() {
 			'show_in_rest'     => true,
 		)
 	);
+
+	register_comment_type(
+		'sample',
+		array(
+			'label'            => __( 'Samples', 'wp-comment-types' ),
+			'labels'           => array(
+				'singular_name'   => _x( 'Sample', 'Comment singular name', 'wp-comment-types' ),
+				'admin_menu_name' => _x( 'Samples', 'Comment screen main nav', 'wp-comment-types' ),
+			),
+			'public'           => true,
+			'delete_with_user' => false,
+			'supports'         => array( 'editor' ),
+			'show_in_rest'     => true,
+		)
+	);
 }
 add_action( 'init', __NAMESPACE__ . '\custom_comment_type' );

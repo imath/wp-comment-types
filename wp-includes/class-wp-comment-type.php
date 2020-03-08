@@ -95,6 +95,26 @@ final class WP_Comment_Type {
 	public $show_ui;
 
 	/**
+	 * The position in the menu order the comment type should appear.
+	 *
+	 * Default is `26` (under the Comments menu).
+	 *
+	 * @since 1.0.0
+	 * @var integer $menu_position
+	 */
+	public $menu_position = 26;
+
+	/**
+	 * The url to the icon, a base64-encoded SVG using a data URI, or a Dashicons helper class to be used for this menu.
+	 *
+	 * Default is `dashicons-admin-comments`.
+	 *
+	 * @since 1.0.0
+	 * @var string $menu_icon
+	 */
+	public $menu_icon = 'dashicons-admin-comments';
+
+	/**
 	 * Whether to include the comment type into the /wp-admin/edit-comments.php dropdown filter.
 	 *
 	 * Default is the value of $public.
@@ -234,6 +254,8 @@ final class WP_Comment_Type {
 			'description'               => '',
 			'public'                    => true,
 			'show_ui'                   => null,
+			'menu_position'             => null,
+			'menu_icon'                 => null,
 			'show_in_comments_dropdown' => null,
 			'capabilities'              => array(),
 			'supports'                  => array(),
@@ -262,6 +284,16 @@ final class WP_Comment_Type {
 		// If not set, default to the setting for public.
 		if ( null === $args['show_ui'] ) {
 			$args['show_ui'] = $args['public'];
+		}
+
+		if ( $args['show_ui'] ) {
+			if ( null === $args['menu_position'] ) {
+				$args['menu_position'] = 26;
+			}
+
+			if ( null === $args['menu_icon'] ) {
+				$args['menu_icon'] = 'dashicons-admin-comments';
+			}
 		}
 
 		// If not set, default to the setting for public.
