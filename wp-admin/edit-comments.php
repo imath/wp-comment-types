@@ -14,24 +14,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Loads the Comment Type Admin screen.
+ *
+ * @since 1.0.0
+ */
+function admin_comment_types_load() {
+	$current_screen = get_current_screen();
+
+	if ( isset( $current_screen->id ) ) {
+		$comment_type = str_replace( 'toplevel_page_wpct-', '', $current_screen->id );
+
+		if ( comment_type_exists( $comment_type ) ) {
+			$current_screen->comment_type = $comment_type;
+		}
+	}
+
+	if ( ! isset( $current_screen->comment_type ) ) {
+		wp_die( esc_html__( 'Invalid comment type.', 'wp-comment-types' ) );
+	}
+}
+
+/**
  * Displays the Comment Types admin screen.
  *
  * @since 1.0.0
  */
 function admin_comment_types() {
-	$title        = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
-	$comment_type = null;
-
-	if ( isset( $_GET['page'] ) ) { // phpcs:ignore
-		$get_page = sanitize_key( wp_unslash( $_GET['page'] ) ); // phpcs:ignore
-		$get_type = str_replace( 'wpct-', '', $get_page );
-
-		$comment_type = get_comment_type_object( $get_type );
-	}
+	$current_screen = get_current_screen();
+	$comment_type   = get_comment_type_object( $current_screen->comment_type );
 
 	if ( null !== $comment_type ) {
 		$title = $comment_type->label;
+	} else {
+		$title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
 	}
+
 	?>
 	<div class="wrap">
 		<h1><?php echo esc_html( $title ); ?></h1>
