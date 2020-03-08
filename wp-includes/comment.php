@@ -156,11 +156,11 @@ function get_comment_type_labels( $comment_type_object ) {
 	$labels = (object) wp_parse_args( $comment_type_object->labels, array() );
 
 	if ( ! isset( $labels->name ) ) {
-		$labels->name = $comment_type_object->name;
+		$labels->name = $comment_type_object->label;
 	}
 
 	if ( ! isset( $labels->admin_menu_name ) ) {
-		$labels->admin_menu_name = $comment_type_object->name;
+		$labels->admin_menu_name = $comment_type_object->label;
 	}
 
 	if ( ! isset( $labels->awaiting_mod_item ) ) {

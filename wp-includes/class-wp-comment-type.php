@@ -248,6 +248,7 @@ final class WP_Comment_Type {
 
 		// Args prefixed with an underscore are reserved for internal use.
 		$defaults = array(
+			'label'                     => '',
 			'labels'                    => array(),
 			'plural'                    => null,
 			'singular'                  => null,
@@ -270,6 +271,11 @@ final class WP_Comment_Type {
 		$args = array_merge( $defaults, $args );
 
 		$args['name'] = $this->name;
+
+		// If not set, default to the uppercased comment type key.
+		if ( null === $args['label'] ) {
+			$args['label'] = ucfirst( $this->name );
+		}
 
 		// If not set, default to the comment type key.
 		if ( null === $args['singular'] ) {
