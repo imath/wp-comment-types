@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Adds a hook to shortcircuit the wp-admin/edit-comments.php page if needed.
+// Adds a hook to shortcircuit the `wp-admin/edit-comments.php` page if needed.
 add_action( 'load-edit-comments.php', __NAMESPACE__ . '\admin_comment_types_load', 0 );
 
 /**
@@ -45,3 +45,22 @@ function admin_parent_file( $parent_file ) {
 	return $parent_file;
 }
 add_filter( 'parent_file', __NAMESPACE__ . '\admin_parent_file', 0 );
+
+/**
+ * Overrides the items to list into the `wp-admin/edit-comments.php` comment types dropdown.
+ *
+ * @since 1.0.0
+ *
+ * @return array The comment types dropdown options.
+ */
+function admin_comment_types_dropdown() {
+	$comment_types = get_comment_types(
+		array(
+			'show_in_comments_dropdown' => true,
+		),
+		'objects'
+	);
+
+	return wp_list_pluck( $comment_types, 'label', 'name' );
+}
+add_filter( 'admin_comment_types_dropdown', __NAMESPACE__ . '\admin_comment_types_dropdown', 0 );

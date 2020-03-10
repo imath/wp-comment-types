@@ -71,57 +71,60 @@ function create_initial_comment_types() {
 	register_comment_type(
 		'comment',
 		array(
-			'label'                 => __( 'Comments', 'wp-comment-types' ),
-			'labels'                => array(
+			'label'                     => __( 'Comments', 'wp-comment-types' ),
+			'labels'                    => array(
 				'singular_name'   => _x( 'Comment', 'Comment singular name', 'wp-comment-types' ),
 				'admin_menu_name' => _x( 'Comments', 'Comment screen main nav', 'wp-comment-types' ),
 			),
-			'public'                => true,
-			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
-			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'delete_with_user'      => false,
-			'supports'              => array( 'editor' ),
-			'show_in_rest'          => true,
-			'rest_base'             => 'comments',
-			'rest_controller_class' => 'WP_REST_Comments_Controller',
+			'public'                    => true,
+			'show_in_comments_dropdown' => true,
+			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
+			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
+			'delete_with_user'          => false,
+			'supports'                  => array( 'editor' ),
+			'show_in_rest'              => true,
+			'rest_base'                 => 'comments',
+			'rest_controller_class'     => 'WP_REST_Comments_Controller',
 		)
 	);
 
 	register_comment_type(
 		'pings',
 		array(
-			'label'                 => __( 'Pings' ),
-			'labels'                => array(
+			'label'                     => __( 'Pings' ),
+			'labels'                    => array(
 				'singular_name'   => _x( 'Ping', 'Comment singular name' ),
 				'admin_menu_name' => _x( 'Pings', 'Comment screen main nav' ),
 			),
-			'public'                => true,
-			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
-			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'delete_with_user'      => false,
-			'supports'              => array(),
-			'show_in_rest'          => true,
-			'rest_base'             => 'comments',
-			'rest_controller_class' => 'WP_REST_Comments_Controller',
+			'public'                    => true,
+			'show_in_comments_dropdown' => true,
+			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
+			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
+			'delete_with_user'          => false,
+			'supports'                  => array(),
+			'show_in_rest'              => true,
+			'rest_base'                 => 'comments',
+			'rest_controller_class'     => 'WP_REST_Comments_Controller',
 		)
 	);
 
 	register_comment_type(
 		'trackback',
 		array(
-			'label'                 => __( 'Trackbacks', 'wp-comment-types' ),
-			'labels'                => array(
+			'label'                     => __( 'Trackbacks', 'wp-comment-types' ),
+			'labels'                    => array(
 				'singular_name'   => _x( 'Trackback', 'Comment singular name', 'wp-comment-types' ),
 				'admin_menu_name' => _x( 'Trackbacks', 'Comment screen main nav', 'wp-comment-types' ),
 			),
-			'public'                => true,
-			'_builtin'              => true, /* internal use only. don't use this when registering your own comment type. */
-			'_edit_link'            => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
-			'delete_with_user'      => false,
-			'supports'              => array(),
-			'show_in_rest'          => true,
-			'rest_base'             => 'comments',
-			'rest_controller_class' => 'WP_REST_Comments_Controller',
+			'public'                    => true,
+			'show_in_comments_dropdown' => true,
+			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
+			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
+			'delete_with_user'          => false,
+			'supports'                  => array(),
+			'show_in_rest'              => true,
+			'rest_base'                 => 'comments',
+			'rest_controller_class'     => 'WP_REST_Comments_Controller',
 		)
 	);
 }

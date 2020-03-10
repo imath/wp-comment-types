@@ -257,7 +257,7 @@ final class WP_Comment_Type {
 			'show_ui'                   => null,
 			'menu_position'             => null,
 			'menu_icon'                 => null,
-			'show_in_comments_dropdown' => null,
+			'show_in_comments_dropdown' => false,
 			'capabilities'              => array(),
 			'supports'                  => array(),
 			'delete_with_user'          => false,
@@ -287,6 +287,11 @@ final class WP_Comment_Type {
 			$args['plural'] = $args['singular'] . 's';
 		}
 
+		// If the comment type is included into the comment dropdown, do not generate a specific UI for it.
+		if ( true === $args['show_in_comments_dropdown'] && 'comment' !== $this->name ) {
+			$args['show_ui'] = false;
+		}
+
 		// If not set, default to the setting for public.
 		if ( null === $args['show_ui'] ) {
 			$args['show_ui'] = $args['public'];
@@ -300,11 +305,6 @@ final class WP_Comment_Type {
 			if ( null === $args['menu_icon'] ) {
 				$args['menu_icon'] = 'dashicons-admin-comments';
 			}
-		}
-
-		// If not set, default to the setting for public.
-		if ( null === $args['show_in_comments_dropdown'] ) {
-			$args['show_in_comments_dropdown'] = $args['public'];
 		}
 
 		// If there's no specified edit link and no UI, remove the edit link.
