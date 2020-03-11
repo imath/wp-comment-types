@@ -91,3 +91,6 @@ function comments_list_table_query_args( $args = array() ) {
 	return $args;
 }
 add_filter( 'comments_list_table_query_args', __NAMESPACE__ . '\comments_list_table_query_args', 0, 1 );
+
+// Adds a hook to shortcircuit the `wp_count_comments()` function.
+add_filter( 'wp_count_comments', __NAMESPACE__ . '\wp_count_comments', 0, 1 );

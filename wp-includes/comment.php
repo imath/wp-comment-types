@@ -219,6 +219,235 @@ function get_comment_types( $args = array(), $output = 'names', $operator = 'and
 }
 
 /**
+ * Retrieves the total comment counts for the whole site or a single post.
+ *
+ * Unlike wp_count_comments(), this function always returns the live comment counts without caching.
+ *
+ * @since 1.0.0
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @param int   $post_id Optional. Restrict the comment counts to the given post. Default 0, which indicates that
+ *                       comment counts for the whole site will be retrieved.
+ * @param array $types Optional. Restrict comment counts to one or more specific types.
+ *
+ * @return array() {
+ *     The number of comments keyed by their status.
+ *
+ *     @type int|string $approved            The number of approved comments.
+ *     @type int|string $awaiting_moderation The number of comments awaiting moderation (a.k.a. pending).
+ *     @type int|string $spam                The number of spam comments.
+ *     @type int|string $trash               The number of trashed comments.
+ *     @type int|string $post-trashed        The number of comments for posts that are in the trash.
+ *     @type int        $total_comments      The total number of non-trashed comments, including spam.
+ *     @type int        $all                 The total number of pending or approved comments.
+ * }
+ */
+function get_comment_count( $post_id = 0, $types = array() ) {
+	global $wpdb;
+
+	$post_id = (int) $post_id;
+
+	$sql_select   = array( 'comment_approved', 'COUNT( * ) AS total' );
+	$select       = '';
+	$sql_where    = array();
+	$where        = '';
+	$sql_group_by = array( 'comment_approved' );
+	$group_by     = '';
+	$in_types     = array();
+
+	if ( $post_id > 0 ) {
+		$sql_where[] = $wpdb->prepare( 'comment_post_ID = %d', $post_id );
+	}
+
+	if ( ! is_array( $types ) ) {
+		$types = (array) $types;
+	}
+
+	if ( array_filter( $types ) ) {
+		$in_types = array_intersect( $types, get_comment_types() );
+
+		if ( $in_types ) {
+			if ( 1 < count( $in_types ) ) {
+				array_unshift( $sql_select, 'comment_type AS type' );
+				$sql_group_by[] = 'comment_type';
+			}
+
+			// Add compat type `''` used for comments.
+			if ( in_array( 'comment', $in_types, true ) ) {
+				$in_types[] = '';
+			}
+
+			$sql_where[] = sprintf( 'comment_type IN ( "%s" )', implode( '", "', array_map( 'sanitize_key', $in_types ) ) );
+
+			// Remove compat type `''` used for comments.
+			$types = array_filter( $in_types );
+		}
+	} else {
+		$show_in_comments_dropdown_types = array_merge(
+			array( '' ), // Legacy comments are saving their types using an empty string.
+			get_comment_types(
+				array(
+					'show_in_comments_dropdown' => true,
+				)
+			)
+		);
+
+		$sql_where[] = sprintf( 'comment_type IN ( "%s" )', implode( '", "', array_map( 'sanitize_key', $show_in_comments_dropdown_types ) ) );
+	}
+
+	$select = implode( ', ', $sql_select );
+
+	if ( $sql_where ) {
+		$where = 'WHERE ' . implode( ' AND ', $sql_where );
+	}
+
+	$group_by = implode( ', ', $sql_group_by );
+
+	// phpcs:disable
+	$totals = (array) $wpdb->get_results(
+		"
+		SELECT {$select}
+		FROM {$wpdb->comments}
+		{$where}
+		GROUP BY {$group_by}
+	",
+		ARRAY_A
+	);
+	// phpcs:enable
+
+	$comment_count = array(
+		'approved'            => 0,
+		'awaiting_moderation' => 0,
+		'spam'                => 0,
+		'trash'               => 0,
+		'post-trashed'        => 0,
+		'total_comments'      => 0,
+		'all'                 => 0,
+	);
+
+	if ( $types ) {
+		$comment_types_count = array_fill_keys( $types, $comment_count );
+
+		if ( 1 === count( $types ) ) {
+			$type = reset( $types );
+		}
+	} else {
+		$type                = 'any';
+		$comment_types_count = array(
+			$type => $comment_count,
+		);
+	}
+
+	foreach ( $totals as $row ) {
+		if ( isset( $row['type'] ) ) {
+			$type = $row['type'];
+
+			if ( '' === $type ) {
+				$type = 'comment';
+			}
+		}
+
+		switch ( $row['comment_approved'] ) {
+			case 'trash':
+				$comment_types_count[ $type ]['trash'] = $row['total'];
+				break;
+			case 'post-trashed':
+				$comment_types_count[ $type ]['post-trashed'] = $row['total'];
+				break;
+			case 'spam':
+				$comment_types_count[ $type ]['spam']            = $row['total'];
+				$comment_types_count[ $type ]['total_comments'] += $row['total'];
+				break;
+			case '1':
+				$comment_types_count[ $type ]['approved']        = $row['total'];
+				$comment_types_count[ $type ]['total_comments'] += $row['total'];
+				$comment_types_count[ $type ]['all']            += $row['total'];
+				break;
+			case '0':
+				$comment_types_count[ $type ]['awaiting_moderation'] = $row['total'];
+				$comment_types_count[ $type ]['total_comments']     += $row['total'];
+				$comment_types_count[ $type ]['all']                += $row['total'];
+				break;
+			default:
+				break;
+		}
+	}
+
+	if ( 3 !== count( $sql_select ) ) {
+		$comment_types_count = reset( $comment_types_count );
+	}
+
+	return $comment_types_count;
+}
+
+/**
+ * Retrieves the total comment counts for the whole site or a single post.
+ *
+ * The comment stats are cached and then retrieved, if they already exist in the
+ * cache.
+ *
+ * @see get_comment_count() Which handles fetching the live comment counts.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $post_id Optional. Restrict the comment counts to the given post. Default 0, which indicates that
+ *                        comment counts for the whole site will be retrieved.
+ * @param string $type Optional. Restrict comment counts to a specific type.
+ *
+ * @return stdClass {
+ *     The number of comments keyed by their status.
+ *
+ *     @type int|string $approved       The number of approved comments.
+ *     @type int|string $moderated      The number of comments awaiting moderation (a.k.a. pending).
+ *     @type int|string $spam           The number of spam comments.
+ *     @type int|string $trash          The number of trashed comments.
+ *     @type int|string $post-trashed   The number of comments for posts that are in the trash.
+ *     @type int        $total_comments The total number of non-trashed comments, including spam.
+ *     @type int        $all            The total number of pending or approved comments.
+ * }
+ */
+function wp_count_comments( $post_id = 0, $type = '' ) {
+	$post_id = (int) $post_id;
+
+	/**
+	 * Filters the comments count for a given post or the whole site.
+	 *
+	 * @since 2.7.0
+	 * @since ? Adds the $type parameter.
+	 *
+	 * @param array|stdClass $count   An empty array or an object containing comment counts.
+	 * @param int            $post_id The post ID. Can be 0 to represent the whole site.
+	 * @param string         $type    The comment type. Empty string for all types.
+	 */
+	// phpcs:disable
+	/*$filtered = apply_filters( 'wp_count_comments', array(), $post_id, $type );
+	if ( ! empty( $filtered ) ) {
+		return $filtered;
+	}*/
+	// phpcs:enable
+
+	$cache_suffix = $post_id;
+	if ( $type && in_array( $type, get_comment_types(), true ) ) {
+		$cache_suffix .= '-' . $type;
+	}
+
+	$count = wp_cache_get( "comments-{$cache_suffix}", 'counts' );
+	if ( false !== $count ) {
+		return $count;
+	}
+
+	$stats              = get_comment_count( $post_id, $type );
+	$stats['moderated'] = $stats['awaiting_moderation'];
+	unset( $stats['awaiting_moderation'] );
+
+	$stats_object = (object) $stats;
+	wp_cache_set( "comments-{$cache_suffix}", $stats_object, 'counts' );
+
+	return $stats_object;
+}
+
+/**
  * Retrieves the total comment counts for the given types.
  *
  * @since 1.0.0
@@ -226,7 +455,7 @@ function get_comment_types( $args = array(), $output = 'names', $operator = 'and
  * @param array $types The list of types needed to be counted.
  * @return array       An associative array of the count objects keyed according to their type.
  */
-function wp_count_comments( $types = array() ) {
+function wp_count_comment_types( $types = array() ) {
 	if ( ! $types ) {
 		$types = get_comment_types();
 	}
@@ -241,7 +470,7 @@ function wp_count_comments( $types = array() ) {
 	 * @param array $counts An empty array or the array containing comment counts.
 	 * @param array $types  The list of comment type's names.
 	 */
-	$filtered = apply_filters( 'wp_count_comments', $counts, $types );
+	$filtered = apply_filters( 'wp_count_comment_types', $counts, $types );
 	if ( ! empty( $filtered ) ) {
 		return $filtered;
 	}

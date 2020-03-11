@@ -57,6 +57,8 @@ function admin_comment_types_load() {
 	<div class="wrap">
 		<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
 		<hr class="wp-header-end">
+
+		<pre><?php print_r( wp_count_comments( 0, $comment_type ) ); // phpcs:ignore ?></pre>
 	</div>
 
 	<?php
