@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function admin_comment_types_load() {
 	$current_screen = get_current_screen();
 
-	if ( ! isset( $current_screen->id ) || ! isset( $_GET['comment_type'] ) ) { // phpcs:ignore
+	if ( ! isset( $current_screen->id ) || ! isset( $_GET['comment_type'] ) || ! $_GET['comment_type'] ) { // phpcs:ignore
 		return;
 	}
 

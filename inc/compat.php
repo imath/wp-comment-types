@@ -64,3 +64,30 @@ function admin_comment_types_dropdown() {
 	return wp_list_pluck( $comment_types, 'label', 'name' );
 }
 add_filter( 'admin_comment_types_dropdown', __NAMESPACE__ . '\admin_comment_types_dropdown', 0 );
+
+/**
+ * Restrict the queried comment types to the one showing into the dropdown menu
+ *
+ * NB: this filter is used in WP_Comments_List_Table::prepare_items()
+ *
+ * @since 1.0.0
+ *
+ * @param array $args The comments query arguments used into the Comments Admin screen.
+ * @return array The comments query arguments used into the Comments Admin screen.
+ */
+function comments_list_table_query_args( $args = array() ) {
+	/**
+	 * The comment types to query as listed into the dropdown of the legacy
+	 * comments administration screen.
+	 */
+	if ( ! $args['type'] ) {
+		$args['type'] = get_comment_types(
+			array(
+				'show_in_comments_dropdown' => true,
+			)
+		);
+	}
+
+	return $args;
+}
+add_filter( 'comments_list_table_query_args', __NAMESPACE__ . '\comments_list_table_query_args', 0, 1 );
