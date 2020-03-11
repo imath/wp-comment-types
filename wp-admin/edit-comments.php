@@ -40,7 +40,12 @@ function admin_comment_types_load() {
 
 	$comment_type_object = get_comment_type_object( $comment_type );
 
-	if ( null !== $comment_type_object ) {
+	// The comment type is using the comments dropdown.
+	if ( isset( $comment_type_object->show_in_comments_dropdown ) && true === $comment_type_object->show_in_comments_dropdown ) {
+		return;
+
+		// The comment type has its own Admin UI.
+	} elseif ( isset( $comment_type_object->label ) && $comment_type_object->label ) {
 		$page_title = $comment_type_object->label;
 	} else {
 		$page_title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
