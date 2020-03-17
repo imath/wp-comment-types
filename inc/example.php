@@ -24,8 +24,11 @@ function custom_comment_type() {
 		array(
 			'label'            => __( 'Examples', 'wp-comment-types' ),
 			'labels'           => array(
-				'singular_name'   => _x( 'Example', 'Comment singular name', 'wp-comment-types' ),
-				'admin_menu_name' => _x( 'Examples', 'Comment screen main nav', 'wp-comment-types' ),
+				'singular_name'      => _x( 'Example', 'Comment singular name', 'wp-comment-types' ),
+				'admin_menu_name'    => _x( 'Examples', 'Comment screen main nav', 'wp-comment-types' ),
+				'not_found'          => _x( 'No examples found', '`not_found` comment type label', 'wp-comment-types' ),
+				'no_awaiting_mod'    => _x( 'No examples awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
+				'not_found_in_trash' => _x( 'No examples found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
 			),
 			'public'           => true,
 			'delete_with_user' => false,

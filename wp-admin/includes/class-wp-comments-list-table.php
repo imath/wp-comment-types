@@ -221,10 +221,14 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	public function no_items() {
 		global $comment_status;
 
+		$labels = get_comment_type_object( $this->type )->labels;
+
 		if ( 'moderated' === $comment_status ) {
-			printf( esc_html__( 'No %s awaiting moderation.', 'wp-comment-types' ), $this->_args['plural'] );
+			echo esc_html( $labels->no_awaiting_mod );
+		} elseif ( 'trash' === $comment_status ) {
+			echo esc_html( $labels->not_found_in_trash );
 		} else {
-			printf( esc_html__( 'No %s found.', 'wp-comment-types' ), $this->_args['plural'] );
+			echo esc_html( $labels->not_found );
 		}
 	}
 
