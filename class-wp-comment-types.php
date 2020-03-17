@@ -194,7 +194,19 @@ final class WP_Comment_Types {
 			strtolower( $class )
 		);
 
-		$path = plugin_dir_path( __FILE__ ) . "wp-includes/class-{$name}.php";
+		$directories = array(
+			'wp-comment-type'        => 'wp-includes',
+			'wp-comments-list-table' => 'wp-admin/includes',
+		);
+
+		$directory = '';
+		if ( isset( $directories[ $name ] ) ) {
+			$directory = $directories[ $name ];
+		} else {
+			return;
+		}
+
+		$path = plugin_dir_path( __FILE__ ) . "{$directory}/class-{$name}.php";
 
 		// Sanity check.
 		if ( ! file_exists( $path ) ) {

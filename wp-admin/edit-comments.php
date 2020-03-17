@@ -51,14 +51,55 @@ function admin_comment_types_load() {
 		$page_title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
 	}
 
+	$wp_list_table = new WP_Comments_List_Table(
+		array(
+			'plural'   => $comment_type_object->plural,
+			'singular' => $comment_type_object->singular,
+			'ajax'     => false,
+			'screen'   => $current_screen,
+		)
+	);
+
+	$pagenum  = $wp_list_table->get_pagenum();
+	$doaction = $wp_list_table->current_action();
+
+	$wp_list_table->prepare_items();
+	add_screen_option( 'per_page' );
+
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	?>
 
 	<div class="wrap">
 		<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
+		<?php
+		if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
+			echo '<span class="subtitle">';
+			printf(
+				/* translators: %s: Search query. */
+				__( 'Search results for &#8220;%s&#8221;', 'wp-comment-types' ),
+				wp_html_excerpt( esc_html( wp_unslash( $_REQUEST['s'] ) ), 50, '&hellip;' )
+			);
+			echo '</span>';
+		}
+		?>
 		<hr class="wp-header-end">
 
-		<pre><?php print_r( wp_count_comments( 0, $comment_type ) ); // phpcs:ignore ?></pre>
+		<?php $wp_list_table->views(); ?>
+
+		<form id="comments-form" method="get">
+			<?php $wp_list_table->search_box( __( 'Search Comments' ), 'comment', 'wp-comment-types' ); ?>
+			<input type="hidden" name="pagegen_timestamp" value="<?php echo esc_attr( current_time( 'mysql', 1 ) ); ?>" />
+
+			<input type="hidden" name="_total" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'total_items' ) ); ?>" />
+			<input type="hidden" name="_per_page" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'per_page' ) ); ?>" />
+			<input type="hidden" name="_page" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'page' ) ); ?>" />
+
+			<?php if ( isset( $_REQUEST['paged'] ) ) { ?>
+				<input type="hidden" name="paged" value="<?php echo esc_attr( absint( $_REQUEST['paged'] ) ); ?>" />
+			<?php } ?>
+
+			<?php $wp_list_table->display(); ?>
+		</form>
 	</div>
 
 	<?php
