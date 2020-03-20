@@ -29,6 +29,7 @@ function custom_comment_type() {
 				'not_found'          => _x( 'No examples found', '`not_found` comment type label', 'wp-comment-types' ),
 				'no_awaiting_mod'    => _x( 'No examples awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
 				'not_found_in_trash' => _x( 'No examples found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
+				'search_items'       => _x( 'Search Examples', '`search_items` comment type label', 'wp-comment-types' ),
 			),
 			'public'           => true,
 			'delete_with_user' => false,

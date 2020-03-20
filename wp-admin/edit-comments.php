@@ -87,7 +87,7 @@ function admin_comment_types_load() {
 		<?php $wp_list_table->views(); ?>
 
 		<form id="comments-form" method="get">
-			<?php $wp_list_table->search_box( __( 'Search Comments' ), 'comment', 'wp-comment-types' ); ?>
+			<?php $wp_list_table->search_box( $comment_type_object->labels->search_items, 'comment', 'wp-comment-types' ); ?>
 			<input type="hidden" name="pagegen_timestamp" value="<?php echo esc_attr( current_time( 'mysql', 1 ) ); ?>" />
 
 			<input type="hidden" name="_total" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'total_items' ) ); ?>" />

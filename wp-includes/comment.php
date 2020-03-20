@@ -259,6 +259,7 @@ function get_comment_type_labels( $comment_type_object ) {
 			'not_found'          => _x( 'No comments found', '`not_found` comment type label', 'wp-comment-types' ),
 			'no_awaiting_mod'    => _x( 'No comments awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
 			'not_found_in_trash' => _x( 'No comments found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
+			'search_items'       => _x( 'Search Comments', '`search_items` comment type label', 'wp-comment-types' ),
 		)
 	);
 
