@@ -327,6 +327,29 @@ final class WP_Comment_Type {
 	}
 
 	/**
+	 * Sets the features support for the comment type.
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_supports() {
+		if ( ! empty( $this->supports ) ) {
+			foreach ( $this->supports as $feature => $args ) {
+				if ( is_array( $args ) ) {
+					add_comment_type_support( $this->name, $feature, $args );
+				} else {
+					add_comment_type_support( $this->name, $args );
+				}
+			}
+
+			unset( $this->supports );
+
+		} elseif ( false !== $this->supports ) {
+			// Add default features.
+			add_comment_type_support( $this->name, array( 'avatar' ) );
+		}
+	}
+
+	/**
 	 * Gets the REST API controller for this comment type.
 	 *
 	 * Will only instantiate the controller class once per request.

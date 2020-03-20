@@ -72,12 +72,12 @@ function admin_comment_types_load() {
 	<div class="wrap">
 		<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
 		<?php
-		if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
+		if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) { // phpcs:ignore
 			echo '<span class="subtitle">';
 			printf(
 				/* translators: %s: Search query. */
-				__( 'Search results for &#8220;%s&#8221;', 'wp-comment-types' ),
-				wp_html_excerpt( esc_html( wp_unslash( $_REQUEST['s'] ) ), 50, '&hellip;' )
+				__( 'Search results for &#8220;%s&#8221;', 'wp-comment-types' ), // phpcs:ignore
+				wp_html_excerpt( esc_html( wp_unslash( $_REQUEST['s'] ) ), 50, '&hellip;' ) // phpcs:ignore
 			);
 			echo '</span>';
 		}
@@ -94,8 +94,8 @@ function admin_comment_types_load() {
 			<input type="hidden" name="_per_page" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'per_page' ) ); ?>" />
 			<input type="hidden" name="_page" value="<?php echo esc_attr( $wp_list_table->get_pagination_arg( 'page' ) ); ?>" />
 
-			<?php if ( isset( $_REQUEST['paged'] ) ) { ?>
-				<input type="hidden" name="paged" value="<?php echo esc_attr( absint( $_REQUEST['paged'] ) ); ?>" />
+			<?php if ( isset( $_REQUEST['paged'] ) ) { // phpcs:ignore ?>
+				<input type="hidden" name="paged" value="<?php echo esc_attr( absint( $_REQUEST['paged'] ) ); // phpcs:ignore ?>" />
 			<?php } ?>
 
 			<?php $wp_list_table->display(); ?>

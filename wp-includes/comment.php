@@ -14,6 +14,100 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Registers support of certain features for a comment type.
+ *
+ * @since 1.0.0
+ *
+ * @param string       $comment_type The comment type for which to add the feature.
+ * @param string|array $feature      The feature being added, accepts an array of
+ *                                   feature strings or a single string.
+ * @param mixed        ...$args      Optional extra arguments to pass along with certain features.
+ */
+function add_comment_type_support( $comment_type, $feature, ...$args ) {
+	$wp_comment_type_features = instance()->comment_type_features;
+
+	$features = (array) $feature;
+	foreach ( $features as $feature ) {
+		if ( $args ) {
+			$wp_comment_type_features[ $comment_type ][ $feature ] = $args;
+		} else {
+			$wp_comment_type_features[ $comment_type ][ $feature ] = true;
+		}
+	}
+
+	instance()->comment_type_features = $wp_comment_type_features;
+}
+
+/**
+ * Remove support for a feature from a comment type.
+ *
+ * @since 1.0.0
+ *
+ * @param string $comment_type The comment type for which to remove the feature.
+ * @param string $feature      The feature being removed.
+ */
+function remove_comment_type_support( $comment_type, $feature ) {
+	$wp_comment_type_features = instance()->comment_type_features;
+
+	unset( $wp_comment_type_features[ $comment_type ][ $feature ] );
+
+	instance()->comment_type_features = $wp_comment_type_features;
+}
+
+/**
+ * Get all the comment type features
+ *
+ * @since 1.0.0
+ *
+ * @param string $comment_type The comment type.
+ * @return array Comment type supports list.
+ */
+function get_all_comment_type_supports( $comment_type ) {
+	$wp_comment_type_features = instance()->comment_type_features;
+
+	if ( isset( $wp_comment_type_features[ $comment_type ] ) ) {
+		return $wp_comment_type_features[ $comment_type ];
+	}
+
+	return array();
+}
+
+/**
+ * Check a comment type's support for a given feature.
+ *
+ * @since 1.0.0
+ *
+ * @param string $comment_type The comment type being checked.
+ * @param string $feature   The feature being checked.
+ * @return bool Whether the comment type supports the given feature.
+ */
+function comment_type_supports( $comment_type, $feature ) {
+	$wp_comment_type_features = instance()->comment_type_features;
+
+	return ( isset( $wp_comment_type_features[ $comment_type ][ $feature ] ) );
+}
+
+/**
+ * Retrieves a list of comment type names that support a specific feature.
+ *
+ * @since 1.0.0
+ *
+ * @param array|string $feature  Single feature or an array of features the comment types should support.
+ * @param string       $operator Optional. The logical operation to perform. 'or' means
+ *                               only one element from the array needs to match; 'and'
+ *                               means all elements must match; 'not' means no elements may
+ *                               match. Default 'and'.
+ * @return string[] A list of comment type names.
+ */
+function get_comment_types_by_support( $feature, $operator = 'and' ) {
+	$wp_comment_type_features = instance()->comment_type_features;
+
+	$features = array_fill_keys( (array) $feature, true );
+
+	return array_keys( wp_filter_object_list( $wp_comment_type_features, $features, $operator ) );
+}
+
+/**
  * Registers a comment type.
  *
  * @since 1.0.0
@@ -43,6 +137,9 @@ function register_comment_type( $comment_type, $args = array() ) {
 
 	$comment_type_object               = new WP_Comment_Type( $comment_type, $args );
 	$wp_comment_types[ $comment_type ] = $comment_type_object;
+
+	// Add comment's type supports.
+	$comment_type_object->add_supports();
 
 	// Update the global.
 	instance()->comment_types = $wp_comment_types;
@@ -81,7 +178,7 @@ function create_initial_comment_types() {
 			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
 			'delete_with_user'          => false,
-			'supports'                  => array( 'editor' ),
+			'supports'                  => array( 'avatar', 'editor', 'dashboard-widget' ),
 			'show_in_rest'              => true,
 			'rest_base'                 => 'comments',
 			'rest_controller_class'     => 'WP_REST_Comments_Controller',
@@ -101,7 +198,7 @@ function create_initial_comment_types() {
 			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
 			'delete_with_user'          => false,
-			'supports'                  => array(),
+			'supports'                  => array( 'dashboard-widget' ),
 			'show_in_rest'              => true,
 			'rest_base'                 => 'comments',
 			'rest_controller_class'     => 'WP_REST_Comments_Controller',
@@ -121,7 +218,7 @@ function create_initial_comment_types() {
 			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
 			'_edit_link'                => 'comment.php?comment=%d', /* internal use only. don't use this when registering your own comment type. */
 			'delete_with_user'          => false,
-			'supports'                  => array(),
+			'supports'                  => array( 'dashboard-widget' ),
 			'show_in_rest'              => true,
 			'rest_base'                 => 'comments',
 			'rest_controller_class'     => 'WP_REST_Comments_Controller',
@@ -156,11 +253,14 @@ function get_comment_type_object( $comment_type ) {
  * @return object                              The comment type labels.
  */
 function get_comment_type_labels( $comment_type_object ) {
-	$labels = (object) wp_parse_args( $comment_type_object->labels, array(
-		'not_found'          => _x( 'No comments found', '`not_found` comment type label', 'wp-comment-types' ),
-		'no_awaiting_mod'    => _x( 'No comments awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
-		'not_found_in_trash' => _x( 'No comments found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
-	) );
+	$labels = (object) wp_parse_args(
+		$comment_type_object->labels,
+		array(
+			'not_found'          => _x( 'No comments found', '`not_found` comment type label', 'wp-comment-types' ),
+			'no_awaiting_mod'    => _x( 'No comments awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
+			'not_found_in_trash' => _x( 'No comments found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
+		)
+	);
 
 	if ( ! isset( $labels->name ) ) {
 		$labels->name = $comment_type_object->label;

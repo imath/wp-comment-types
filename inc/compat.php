@@ -94,3 +94,15 @@ add_filter( 'comments_list_table_query_args', __NAMESPACE__ . '\comments_list_ta
 
 // Adds a hook to shortcircuit the `wp_count_comments()` function.
 add_filter( 'wp_count_comments', __NAMESPACE__ . '\wp_count_comments', 0, 1 );
+
+/**
+ * List of comment types supporting the avatar feature.
+ *
+ * @since 1.0.0
+ *
+ * @return array $types An array of comment types supporting avatars.
+ */
+function get_avatar_comment_types() {
+	return get_comment_types_by_support( 'avatar' );
+}
+add_filter( 'get_avatar_comment_types', __NAMESPACE__ . '\get_avatar_comment_types', 0 );

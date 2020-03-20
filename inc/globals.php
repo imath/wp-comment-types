@@ -29,6 +29,7 @@ function register_globals() {
 	$wpct->languages_path     = plugin_dir_path( dirname( __FILE__ ) ) . 'languages';
 	$wpct->languages_basepath = trailingslashit( dirname( plugin_basename( dirname( __FILE__ ) ) ) ) . 'languages';
 
-	$wpct->comment_types = array();
+	$wpct->comment_types         = array();
+	$wpct->comment_type_features = array();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\register_globals', 10 );

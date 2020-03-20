@@ -32,7 +32,7 @@ function custom_comment_type() {
 			),
 			'public'           => true,
 			'delete_with_user' => false,
-			'supports'         => array( 'editor' ),
+			'supports'         => array( 'avatar', 'editor' ),
 			'show_in_rest'     => true,
 		)
 	);

@@ -79,7 +79,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		parent::__construct( $args );
 
 		$this->type = $this->screen->comment_type;
-		if ( 'comment' === $this->type && get_option( 'show_avatars' ) ) {
+		if ( comment_type_supports( $this->type, 'avatar' ) && get_option( 'show_avatars' ) ) {
 			add_filter( 'comment_author', array( $this, 'floated_admin_avatar' ), 10, 2 );
 		}
 	}

@@ -166,6 +166,7 @@ final class WP_Comment_Types {
 		if ( is_admin() ) {
 			require $wp_admin_path . 'edit-comments.php';
 			require $wp_admin_path . 'menu.php';
+			require $wp_admin_path . 'includes/dashboard.php';
 		}
 
 		require $wp_inc_path . 'default-filters.php';
