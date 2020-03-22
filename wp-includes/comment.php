@@ -169,10 +169,6 @@ function create_initial_comment_types() {
 		'comment',
 		array(
 			'label'                     => __( 'Comments', 'wp-comment-types' ),
-			'labels'                    => array(
-				'singular_name'   => _x( 'Comment', 'Comment singular name', 'wp-comment-types' ),
-				'admin_menu_name' => _x( 'Comments', 'Comment screen main nav', 'wp-comment-types' ),
-			),
 			'public'                    => true,
 			'show_in_comments_dropdown' => true,
 			'_builtin'                  => true, /* internal use only. don't use this when registering your own comment type. */
@@ -256,6 +252,12 @@ function get_comment_type_labels( $comment_type_object ) {
 	$labels = (object) wp_parse_args(
 		$comment_type_object->labels,
 		array(
+			'singular_name'      => _x( 'Comment', '`singular_name` comment type label', 'wp-comment-types' ),
+			'admin_menu_name'    => _x( 'Comments', '`admin_menu_name` comment type label', 'wp-comment-types' ),
+			/* translators: %s: Singular for the number of comments awaiting moderation. */
+			'awaiting_mod_item'  => _x( '%s Comment in moderation', '`awaiting_mod_item` comment type label', 'wp-comment-types' ),
+			/* translators: %s: Plural for the number of comments awaiting moderation. */
+			'awaiting_mod_items' => _x( '%s Comments in moderation', '`awaiting_mod_items` comment type label', 'wp-comment-types' ),
 			'not_found'          => _x( 'No comments found', '`not_found` comment type label', 'wp-comment-types' ),
 			'no_awaiting_mod'    => _x( 'No comments awaiting moderation.', '`no_awaiting_mod` comment type label', 'wp-comment-types' ),
 			'not_found_in_trash' => _x( 'No comments found in Trash.', '`not_found_in_trash` comment type label', 'wp-comment-types' ),
@@ -267,18 +269,8 @@ function get_comment_type_labels( $comment_type_object ) {
 		$labels->name = $comment_type_object->label;
 	}
 
-	if ( ! isset( $labels->admin_menu_name ) ) {
+	if ( ! $labels->admin_menu_name ) {
 		$labels->admin_menu_name = $comment_type_object->label;
-	}
-
-	if ( ! isset( $labels->awaiting_mod_item ) ) {
-		/* translators: %s: Singular for the number of comments awaiting moderation. */
-		$labels->awaiting_mod_item = _x( '%s Comment in moderation', 'Comment Administration screen navigation', 'wp-comment-types' );
-	}
-
-	if ( ! isset( $labels->awaiting_mod_items ) ) {
-		/* translators: %s: Plural for the number of comments awaiting moderation. */
-		$labels->awaiting_mod_items = _x( '%s Comments in moderation', 'Comment Administration screen navigation', 'wp-comment-types' );
 	}
 
 	return $labels;
