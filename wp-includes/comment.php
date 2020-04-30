@@ -370,23 +370,12 @@ function get_comment_count( $post_id = 0, $types = array() ) {
 				$sql_group_by[] = 'comment_type';
 			}
 
-			// Add compat type `''` used for comments.
-			if ( in_array( 'comment', $in_types, true ) ) {
-				$in_types[] = '';
-			}
-
 			$sql_where[] = sprintf( 'comment_type IN ( "%s" )', implode( '", "', array_map( 'sanitize_key', $in_types ) ) );
-
-			// Remove compat type `''` used for comments.
-			$types = array_filter( $in_types );
 		}
 	} else {
-		$show_in_comments_dropdown_types = array_merge(
-			array( '' ), // Legacy comments are saving their types using an empty string.
-			get_comment_types(
-				array(
-					'show_in_comments_dropdown' => true,
-				)
+		$show_in_comments_dropdown_types = get_comment_types(
+			array(
+				'show_in_comments_dropdown' => true,
 			)
 		);
 

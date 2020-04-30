@@ -58,7 +58,7 @@ function wp_dashboard_recent_comments( $total_items = 5 ) {
 
 	if ( $comments ) {
 		echo '<div id="latest-comments" class="activity-block">';
-		echo '<h3>' . __( 'Recent Comments' ) . '</h3>';
+		echo '<h3>' . __( 'Recent Comments', 'wp-comment-types' ) . '</h3>';
 
 		echo '<ul id="the-comment-list" data-wp-lists="list:comment">';
 		foreach ( $comments as $comment ) {
@@ -67,7 +67,7 @@ function wp_dashboard_recent_comments( $total_items = 5 ) {
 		echo '</ul>';
 
 		if ( current_user_can( 'edit_posts' ) ) {
-			echo '<h3 class="screen-reader-text">' . __( 'View more comments' ) . '</h3>';
+			echo '<h3 class="screen-reader-text">' . __( 'View more comments', 'wp-comment-types' ) . '</h3>';
 			_get_list_table( 'WP_Comments_List_Table' )->views();
 		}
 
