@@ -84,6 +84,15 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		}
 	}
 
+	/**
+	 * Adds avatars to comment author names.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $name       Comment author name.
+	 * @param int    $comment_ID Comment ID.
+	 * @return string Avatar with the user name.
+	 */
 	public function floated_admin_avatar( $name, $comment_ID ) {
 		$comment = get_comment( $comment_ID );
 		$avatar  = get_avatar( $comment, 32, 'mystery' );
@@ -91,23 +100,38 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * @return bool
+	 * Checks whether current user can edit the comment type using Ajax.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if current user can edit the comment type. False otherwise.
 	 */
 	public function ajax_user_can() {
 		return current_user_can( 'edit_posts' );
 	}
 
 	/**
+	 * Prepares the comment type items.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global string $mode           List table view mode.
 	 * @global int    $post_id
 	 * @global string $comment_status
 	 * @global string $search
-	 * @global string $comment_type
 	 */
 	public function prepare_items() {
-		global $post_id, $comment_status, $search;
+		global $mode, $post_id, $comment_status, $search;
+
+		if ( isset( $_REQUEST['mode'] ) && $_REQUEST['mode'] ) {
+			$mode = 'excerpt' === $_REQUEST['mode'] ? 'excerpt' : 'list';
+			set_user_setting( 'posts_list_mode', $mode );
+		} else {
+			$mode = get_user_setting( 'posts_list_mode', 'list' );
+		}
 
 		$comment_status = isset( $_REQUEST['comment_status'] ) ? $_REQUEST['comment_status'] : 'all';
-		if ( ! in_array( $comment_status, array( 'all', 'mine', 'moderated', 'approved', 'spam', 'trash' ) ) ) {
+		if ( ! in_array( $comment_status, array( 'all', 'mine', 'moderated', 'approved', 'spam', 'trash' ), true ) ) {
 			$comment_status = 'all';
 		}
 
@@ -127,7 +151,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		if ( isset( $_REQUEST['number'] ) ) {
 			$number = (int) $_REQUEST['number'];
 		} else {
-			$number = $comments_per_page + min( 8, $comments_per_page ); // Grab a few extra
+			$number = $comments_per_page + min( 8, $comments_per_page ); // Grab a few extra.
 		}
 
 		$page = $this->get_pagenum();
@@ -199,8 +223,12 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * @param string $comment_status
-	 * @return int
+	 * Gets the number of comment type's items to display per page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $comment_status The comment status.
+	 * @return int The number of comment type's items to display per page.
 	 */
 	public function get_per_page( $comment_status = 'all' ) {
 		$comments_per_page = $this->get_items_per_page( 'edit_' . $this->_args['plural'] . '_per_page' );
@@ -216,6 +244,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays a message when no items were found.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @global string $comment_status
 	 */
 	public function no_items() {
@@ -233,6 +265,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Gets the comment type's items views.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @global int $post_id
 	 * @global string $comment_status
 	 * @global string $comment_type
@@ -255,7 +291,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 				'All <span class="count">(%s)</span>',
 				'comments',
 				'wp-comment-types'
-			), // singular not used
+			), // singular not used.
 
 			/* translators: %s: Number of comments. */
 			'mine'      => _nx_noop(
@@ -370,32 +406,34 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Gets the list of bulk actions.
+	 *
 	 * @global string $comment_status
 	 *
-	 * @return array
+	 * @return array The list of bulk actions.
 	 */
 	protected function get_bulk_actions() {
 		global $comment_status;
 
 		$actions = array();
-		if ( in_array( $comment_status, array( 'all', 'approved' ) ) ) {
+		if ( in_array( $comment_status, array( 'all', 'approved' ), true ) ) {
 			$actions['unapprove'] = __( 'Unapprove', 'wp-comment-types' );
 		}
-		if ( in_array( $comment_status, array( 'all', 'moderated' ) ) ) {
+		if ( in_array( $comment_status, array( 'all', 'moderated' ), true ) ) {
 			$actions['approve'] = __( 'Approve', 'wp-comment-types' );
 		}
-		if ( in_array( $comment_status, array( 'all', 'moderated', 'approved', 'trash' ) ) ) {
-			$actions['spam'] = _x( 'Mark as Spam', 'comment', 'wp-comment-types' );
+		if ( in_array( $comment_status, array( 'all', 'moderated', 'approved', 'trash' ), true ) ) {
+			$actions['spam'] = _x( 'Mark as spam', 'comment', 'wp-comment-types' );
 		}
 
 		if ( 'trash' === $comment_status ) {
 			$actions['untrash'] = __( 'Restore', 'wp-comment-types' );
 		} elseif ( 'spam' === $comment_status ) {
-			$actions['unspam'] = _x( 'Not Spam', 'comment', 'wp-comment-types' );
+			$actions['unspam'] = _x( 'Not spam', 'comment', 'wp-comment-types' );
 		}
 
-		if ( in_array( $comment_status, array( 'trash', 'spam' ) ) || ! EMPTY_TRASH_DAYS ) {
-			$actions['delete'] = __( 'Delete Permanently', 'wp-comment-types' );
+		if ( in_array( $comment_status, array( 'trash', 'spam' ), true ) || ! EMPTY_TRASH_DAYS ) {
+			$actions['delete'] = __( 'Delete permanently', 'wp-comment-types' );
 		} else {
 			$actions['trash'] = __( 'Move to Trash', 'wp-comment-types' );
 		}
@@ -404,6 +442,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays an extra nav for the comment type.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @global string $comment_status
 	 * @global string $comment_type
 	 *
@@ -416,63 +458,55 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		if ( ! isset( $has_items ) ) {
 			$has_items = $this->has_items();
 		}
-		?>
-		<div class="alignleft actions">
-			<?php
-			if ( 'top' === $which ) {
-				if ( 'comment' === $comment_type ) {
-					?>
-					<label class="screen-reader-text" for="filter-by-comment-type"><?php esc_html_e( 'Filter by comment type', 'wp-comment-types' ); ?></label>
-					<select id="filter-by-comment-type" name="comment_type">
-						<option value=""><?php _e( 'All comment types', 'wp-comment-types' ); ?></option>
-						<?php
-						/**
-						 * Filters the comment types dropdown menu.
-						 *
-						 * @since 2.7.0
-						 *
-						 * @param string[] $comment_types An array of comment types. Accepts 'Comments', 'Pings'.
-						 */
-						$comment_types = admin_comment_types_dropdown();
 
-						foreach ( $comment_types as $type => $label ) {
-							echo "\t" . '<option value="' . esc_attr( $type ) . '"' . selected( $comment_type, $type, false ) . ">$label</option>\n";
-						}
-						?>
-					</select>
+		echo '<div class="alignleft actions">';
 
-					<?php
-					/**
-					 * Fires just before the Filter submit button for comment types.
-					 *
-					 * @since 3.5.0
-					 */
-					do_action( 'restrict_manage_comments' );
-					submit_button( __( 'Filter', 'wp-comment-types' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
-				}
-			}
+		if ( 'top' === $which && 'comment' === $comment_type ) {
+			ob_start();
 
-			if ( ( 'spam' === $comment_status || 'trash' === $comment_status ) && current_user_can( 'moderate_comments' ) && $has_items ) {
-				wp_nonce_field( 'bulk-destroy', '_destroy_nonce' );
-				$title = ( 'spam' === $comment_status ) ? esc_attr__( 'Empty Spam', 'wp-comment-types' ) : esc_attr__( 'Empty Trash', 'wp-comment-types' );
-				submit_button( $title, 'apply', 'delete_all', false );
-			}
+			$this->comment_type_dropdown( $comment_type );
 
 			/**
-			 * Fires after the Filter submit button for comment types.
+			 * Fires just before the Filter submit button for comment types.
 			 *
-			 * @since 2.5.0
-			 *
-			 * @param string $comment_status The comment status name. Default 'All'.
+			 * @since 3.5.0
 			 */
-			do_action( 'manage_comments_nav', $comment_status );
-			?>
-		</div>
-		<?php
+			do_action( 'restrict_manage_comments' );
+
+			$output = ob_get_clean();
+
+			if ( ! empty( $output ) && $this->has_items() ) {
+				echo $output;
+				submit_button( __( 'Filter', 'wp-comment-types' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
+			}
+		}
+
+		if ( ( 'spam' === $comment_status || 'trash' === $comment_status ) && current_user_can( 'moderate_comments' ) && $has_items ) {
+			wp_nonce_field( 'bulk-destroy', '_destroy_nonce' );
+			$title = ( 'spam' === $comment_status ) ? esc_attr__( 'Empty Spam', 'wp-comment-types' ) : esc_attr__( 'Empty Trash', 'wp-comment-types' );
+			submit_button( $title, 'apply', 'delete_all', false );
+		}
+
+		/**
+		 * Fires after the Filter submit button for comment types.
+		 *
+		 * @since 2.5.0
+		 * @since 5.6.0 The `$which` parameter was added.
+		 *
+		 * @param string $comment_status The comment status name. Default 'All'.
+		 * @param string $which          The location of the extra table nav markup: 'top' or 'bottom'.
+		 */
+		do_action( 'manage_comments_nav', $comment_status, $which );
+
+		echo '</div>';
 	}
 
 	/**
-	 * @return string|false
+	 * Gets the screen's current action.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string|false The screen's current action.
 	 */
 	public function current_action() {
 		if ( isset( $_REQUEST['delete_all'] ) || isset( $_REQUEST['delete_all2'] ) ) {
@@ -483,9 +517,13 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Gets the list of columns to display into the list table.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @global int $post_id
 	 *
-	 * @return array
+	 * @return array The list of columns to display into the list table.
 	 */
 	public function get_columns() {
 		global $post_id;
@@ -501,16 +539,69 @@ class WP_Comments_List_Table extends \WP_List_Table {
 
 		if ( ! $post_id ) {
 			/* translators: Column name or table row header. */
-			$columns['response'] = __( 'In Response To', 'wp-comment-types' );
+			$columns['response'] = __( 'In response To', 'wp-comment-types' );
 		}
 
-		$columns['date'] = _x( 'Submitted On', 'column name', 'wp-comment-types' );
+		$columns['date'] = _x( 'Submitted on', 'column name', 'wp-comment-types' );
 
 		return $columns;
 	}
 
 	/**
-	 * @return array
+	 * Displays a comment type drop-down for filtering on the Comments list table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $comment_type The current comment type slug.
+	 */
+	protected function comment_type_dropdown( $comment_type ) {
+		/**
+		 * Filters the comment types shown in the drop-down menu on the Comments list table.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string[] $comment_types Array of comment type labels keyed by their name.
+		 */
+		$comment_types = apply_filters(
+			'admin_comment_types_dropdown',
+			array(
+				'comment' => __( 'Comments' ),
+				'pings'   => __( 'Pings' ),
+			)
+		);
+
+		if ( $comment_types && is_array( $comment_types ) ) {
+			printf( '<label class="screen-reader-text" for="filter-by-comment-type">%s</label>', __( 'Filter by comment type', 'wp-comment-types' ) );
+
+			echo '<select id="filter-by-comment-type" name="comment_type">';
+
+			printf( "\t<option value=''>%s</option>", __( 'All comment types', 'wp-comment-types' ) );
+
+			foreach ( $comment_types as $type => $label ) {
+				if ( get_comments(
+					array(
+						'number' => 1,
+						'type'   => $type,
+					)
+				) ) {
+					printf(
+						"\t<option value='%s'%s>%s</option>\n",
+						esc_attr( $type ),
+						selected( $comment_type, $type, false ),
+						esc_html( $label )
+					);
+				}
+			}
+				echo '</select>';
+		}
+	}
+
+	/**
+	 * Gets the list of sortable columns.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array The list of sortable columns.
 	 */
 	protected function get_sortable_columns() {
 		return array(
@@ -523,7 +614,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	/**
 	 * Get the name of the default primary column.
 	 *
-	 * @since 4.3.0
+	 * @since 1.0.0
 	 *
 	 * @return string Name of the default primary column, in this case, 'comment'.
 	 */
@@ -532,11 +623,11 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Displays the comments table.
+	 * Displays the comment type's itmes table.
 	 *
 	 * Overrides the parent display() method to render extra comments.
 	 *
-	 * @since 3.1.0
+	 * @since 1.0.0
 	 */
 	public function display() {
 		wp_nonce_field( 'fetch-list-' . get_class( $this ), '_ajax_fetch_list_nonce' );
@@ -583,6 +674,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays a comment type's item row.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @global WP_Post    $post    Global post object.
 	 * @global WP_Comment $comment Global comment object.
 	 *
@@ -614,14 +709,16 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	/**
 	 * Generate and display row actions links.
 	 *
-	 * @since 4.3.0
+	 * @since 1.0.0
 	 *
 	 * @global string $comment_status Status for the current listed comments.
 	 *
 	 * @param WP_Comment $comment     The comment object.
 	 * @param string     $column_name Current column name.
 	 * @param string     $primary     Primary column name.
-	 * @return string|void Comment row actions output.
+	 * @return string Row actions output for comments. An empty string
+	 *                if the current column is not the primary column,
+	 *                or if the current user cannot edit the comment.
 	 */
 	protected function handle_row_actions( $comment, $column_name, $primary ) {
 		global $comment_status;
@@ -631,7 +728,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		}
 
 		if ( ! $this->user_can ) {
-			return;
+			return '';
 		}
 
 		$the_comment_status = wp_get_comment_status( $comment );
@@ -666,7 +763,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		);
 
 		// Not looking at all comments.
-		if ( $comment_status && 'all' != $comment_status ) {
+		if ( $comment_status && 'all' !== $comment_status ) {
 			if ( 'approved' === $the_comment_status ) {
 				$actions['unapprove'] = sprintf(
 					'<a href="%s" data-wp-lists="%s" class="vim-u vim-destructive aria-button-if-js" aria-label="%s">%s</a>',
@@ -783,16 +880,35 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		/** This filter is documented in wp-admin/includes/dashboard.php */
 		$actions = apply_filters( 'comment_row_actions', array_filter( $actions ), $comment );
 
+		$always_visible = false;
+
+		$mode = get_user_setting( 'posts_list_mode', 'list' );
+
+		if ( 'excerpt' === $mode ) {
+			$always_visible = true;
+		}
+
+		$out .= '<div class="' . ( $always_visible ? 'row-actions visible' : 'row-actions' ) . '">';
+
 		$i    = 0;
-		$out .= '<div class="row-actions">';
+
 		foreach ( $actions as $action => $link ) {
 			++$i;
-			( ( ( 'approve' === $action || 'unapprove' === $action ) && 2 === $i ) || 1 === $i ) ? $sep = '' : $sep = ' | ';
 
-			// Reply and quickedit need a hide-if-no-js span when not added with ajax
+			if ( ( ( 'approve' === $action || 'unapprove' === $action ) && 2 === $i )
+				|| 1 === $i
+			) {
+				$sep = '';
+			} else {
+				$sep = ' | ';
+			}
+
+			// Reply and quickedit need a hide-if-no-js span when not added with Ajax.
 			if ( ( 'reply' === $action || 'quickedit' === $action ) && ! wp_doing_ajax() ) {
 				$action .= ' hide-if-no-js';
-			} elseif ( ( $action === 'untrash' && $the_comment_status === 'trash' ) || ( $action === 'unspam' && $the_comment_status === 'spam' ) ) {
+			} elseif ( ( 'untrash' === $action && 'trash' === $the_comment_status )
+				|| ( 'unspam' === $action && 'spam' === $the_comment_status )
+			) {
 				if ( '1' == get_comment_meta( $comment->comment_ID, '_wp_trash_meta_status', true ) ) {
 					$action .= ' approve';
 				} else {
@@ -802,6 +918,7 @@ class WP_Comments_List_Table extends \WP_List_Table {
 
 			$out .= "<span class='$action'>$sep$link</span>";
 		}
+
 		$out .= '</div>';
 
 		$out .= '<button type="button" class="toggle-row"><span class="screen-reader-text">' . __( 'Show more details', 'wp-comment-types' ) . '</span></button>';
@@ -810,6 +927,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays the checkbox column.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @param WP_Comment $comment The comment object.
 	 */
 	public function column_cb( $comment ) {
@@ -822,6 +943,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays the comment column.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @param WP_Comment $comment The comment object.
 	 */
 	public function column_comment( $comment ) {
@@ -860,6 +985,8 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays the comment type's author column.
+	 *
 	 * @global string $comment_status
 	 *
 	 * @param WP_Comment $comment The comment object.
@@ -909,15 +1036,19 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays the comment type's item date.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @param WP_Comment $comment The comment object.
 	 */
 	public function column_date( $comment ) {
 		$submitted = sprintf(
 			/* translators: 1: Comment date, 2: Comment time. */
 			__( '%1$s at %2$s', 'wp-comment-types' ),
-			/* translators: Comment date format. See https://secure.php.net/date */
+			/* translators: Comment date format. See https://www.php.net/date */
 			get_comment_date( __( 'Y/m/d', 'wp-comment-types' ), $comment ),
-			/* translators: Comment time format. See https://secure.php.net/date */
+			/* translators: Comment time format. See https://www.php.net/date */
 			get_comment_date( __( 'g:i a', 'wp-comment-types' ), $comment )
 		);
 
@@ -935,6 +1066,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Displays the comment type's response column.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @param WP_Comment $comment The comment object.
 	 */
 	public function column_response( $comment ) {
@@ -994,6 +1129,10 @@ class WP_Comments_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Outputs default column for the comment type.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @param WP_Comment $comment     The comment object.
 	 * @param string     $column_name The custom column's name.
 	 */
@@ -1003,8 +1142,8 @@ class WP_Comments_List_Table extends \WP_List_Table {
 		 *
 		 * @since 2.8.0
 		 *
-		 * @param string $column_name         The custom column's name.
-		 * @param int    $comment->comment_ID The custom column's unique ID number.
+		 * @param string $column_name The custom column's name.
+		 * @param int    $comment_ID  The custom column's unique ID number.
 		 */
 		do_action( 'manage_comments_custom_column', $column_name, $comment->comment_ID );
 	}
