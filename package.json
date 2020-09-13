@@ -3,10 +3,10 @@
 	"bugs": {
 		"url": "https://github.com/imath/wp-comment-types/issues"
 	},
-	"description": "WordPress comment types feature (as a plugin).",
+	"description": "WordPress Comment Types feature (as a plugin).",
 	"engines": {
-		"node": "10.13.0",
-		"npm": "6.13.7"
+		"node": "12.16.0",
+		"npm": "6.14.0"
 	},
 	"scripts": {
 		"wpcs": "./vendor/bin/phpcs class-wp-comment-types.php inc/*.php wp-admin/*.php wp-includes/*.php --standard=WordPress",
