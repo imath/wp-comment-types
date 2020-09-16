@@ -9,6 +9,9 @@
 
 namespace WP\CommentTypes;
 
+use WP_Comment;
+use WP_List_Table;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -22,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @see WP_List_Table
  */
-class WP_Comments_List_Table extends \WP_List_Table {
+class WP_Comments_List_Table extends WP_List_Table {
 	/**
 	 * Comment type key.
 	 *
