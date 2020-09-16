@@ -9,6 +9,9 @@
 
 namespace WP\CommentTypes;
 
+use WP_REST_Comments_Controller;
+use WP_REST_Controller;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
