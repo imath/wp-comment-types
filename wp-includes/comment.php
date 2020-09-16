@@ -8,6 +8,9 @@
 
 namespace WP\CommentTypes;
 
+use WP_Error;
+use stdClass;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
