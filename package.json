@@ -10,7 +10,7 @@
 	},
 	"scripts": {
 		"wpcs": "./vendor/bin/phpcs class-wp-comment-types.php inc/*.php wp-admin/*.php wp-includes/*.php --standard=WordPress",
-		"pot": "wp i18n make-pot --skip-js --headers='{\"Project-Id-Version\": \"WP Comment Types 1.0.0\", \"Report-Msgid-Bugs-To\": \"https://github.com/imath/wp-comment-types/issues\", \"Last-Translator\": \"imath <contact@imathi.eu>\"}' . languages/wp-comment-types.pot"
+		"pot": "wp i18n make-pot --skip-js --headers='{\"Project-Id-Version\": \"WP Comment Types 1.0.0-alpha\", \"Report-Msgid-Bugs-To\": \"https://github.com/imath/wp-comment-types/issues\", \"Last-Translator\": \"imath <contact@imathi.eu>\"}' . languages/wp-comment-types.pot"
 	},
 	"keywords": [
 		"wordpress",
@@ -24,5 +24,5 @@
 		"type": "git",
 		"url": "https://github.com/imath/wp-comment-types.git"
 	},
-	"version": "1.0.0"
+	"version": "1.0.0-alpha"
 }

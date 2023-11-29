@@ -11,7 +11,7 @@
  * Plugin Name:       WP Comment Types
  * Plugin URI:        https://github.com/imath/wp-comment-types
  * Description:       WordPress comment types feature (as a plugin).
- * Version:           1.0.0
+ * Version:           1.0.0-alpha
  * Author:            imath
  * Author URI:        https://imathi.eu
  * Text Domain:       wp-comment-types
@@ -180,7 +180,7 @@ final class WP_Comment_Types {
 	/**
 	 * Class Autoloader.
 	 *
-	 * @since  1.0.0
+	 * @since 1.0.0
 	 *
 	 * @param  string $class The class name.
 	 */

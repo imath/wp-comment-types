@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function register_globals() {
 	$wpct = instance();
 
-	$wpct->version     = '1.0.0';
+	$wpct->version     = '1.0.0-alpha';
 	$wpct->inc_path    = plugin_dir_path( __FILE__ );
 	$wpct->wp_inc_path = plugin_dir_path( dirname( __FILE__ ) ) . 'wp-includes';
 
