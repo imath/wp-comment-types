@@ -1,6 +1,6 @@
 {
   "name": "imath/wp-comment-types",
-  "description": "WordPress comment types feature (as a plugin).",
+  "description": "WordPress comment types suggested feature.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"support": {

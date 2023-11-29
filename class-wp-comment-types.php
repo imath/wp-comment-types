@@ -1,6 +1,6 @@
 <?php
 /**
- * WordPress comment types feature (as a plugin).
+ * WordPress comment types suggested feature.
  *
  * @package   WP\CommentTypes
  * @author    imath
@@ -10,7 +10,7 @@
  * @wordpress-plugin
  * Plugin Name:       WP Comment Types
  * Plugin URI:        https://github.com/imath/wp-comment-types
- * Description:       WordPress comment types feature (as a plugin).
+ * Description:       WordPress comment types suggested feature.
  * Version:           1.0.0-alpha
  * Author:            imath
  * Author URI:        https://imathi.eu
