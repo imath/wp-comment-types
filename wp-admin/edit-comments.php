@@ -45,10 +45,15 @@ function admin_comment_types_load() {
 		return;
 
 		// The comment type has its own Admin UI.
-	} elseif ( isset( $comment_type_object->label ) && $comment_type_object->label ) {
-		$page_title = $comment_type_object->label;
+	} elseif ( isset( $comment_type_object->labels->admin_menu_name ) && $comment_type_object->labels->admin_menu_name ) {
+		$page_title = $comment_type_object->labels->admin_menu_name;
 	} else {
 		$page_title = _x( 'Comment Type', 'default admin screen title', 'wp-comment-types' );
+	}
+
+	// Prevent a deprecated notice in `get_plugin_page_hookname()`.
+	if ( ! isset( $GLOBALS['title'] ) ) {
+		$GLOBALS['title'] = $page_title;
 	}
 
 	$wp_list_table = new WP_Comments_List_Table(
