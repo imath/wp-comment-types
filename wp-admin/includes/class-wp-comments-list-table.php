@@ -487,6 +487,11 @@ class WP_Comments_List_Table extends WP_List_Table {
 
 		if ( ( 'spam' === $comment_status || 'trash' === $comment_status ) && $has_items && current_user_can( 'moderate_comments' ) ) {
 			wp_nonce_field( 'bulk-destroy', '_destroy_nonce' );
+
+			// For some reason the comment status is missing when emptying trash.
+			?>
+			<input type="hidden" name="comment_status" value="<?php echo esc_attr( $comment_status ); ?>" />
+			<?php
 			$title = ( 'spam' === $comment_status ) ? esc_attr__( 'Empty Spam', 'wp-comment-types' ) : esc_attr__( 'Empty Trash', 'wp-comment-types' );
 			submit_button( $title, 'apply', 'delete_all', false );
 		}
