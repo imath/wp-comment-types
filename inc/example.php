@@ -19,6 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function custom_comment_type() {
+	/**
+	 * WP CLI command to create a dummy example
+	 * wp comment create --comment_content="hello example" --comment_author="wp-cli" --comment_type="example"
+	 */
 	register_comment_type(
 		'example',
 		array(
@@ -38,6 +42,10 @@ function custom_comment_type() {
 		)
 	);
 
+	/**
+	 * WP CLI command to create a dummy sample
+	 * wp comment create --comment_content="hello sample" --comment_author="wp-cli" --comment_type="sample"
+	 */
 	register_comment_type(
 		'sample',
 		array(
