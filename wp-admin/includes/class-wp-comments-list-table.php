@@ -646,7 +646,17 @@ class WP_Comments_List_Table extends WP_List_Table {
 			$has_items = $this->has_items();
 
 			if ( $has_items ) {
-				$this->display_tablenav( 'top' );
+				$top = '';
+
+				/*
+				 * Using 'top' simply adds a nonce using `$this->_args['plural']`.
+				 *
+				 * To use regular's 'wp-admin/edit-comments.php` bulk action handlers, we need
+				 * to force the nonce to have the `bulk_comments` value.
+				 * That's why `$top` is an empty string instead of 'top'.
+				 */
+				wp_nonce_field( 'bulk-comments' );
+				$this->display_tablenav( $top );
 			}
 		}
 
